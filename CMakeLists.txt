@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 2.8)
+cmake_minimum_required (VERSION 3.1)
 project(Rocstar Fortran C CXX)
 set (BUILD_STATIC FALSE CACHE BOOL "Build static libraries")
 set (ENABLE_MPI TRUE CACHE BOOL "Build with MPI Support")

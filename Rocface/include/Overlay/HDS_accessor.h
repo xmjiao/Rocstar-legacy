@@ -122,7 +122,7 @@ public:
   Vertex* get_primary( Vertex *v) const
   { return v?get_primary( v, Supports_multiple_panes()):v; }
 
-  HDS_overlay *get_hds( Vertex *v)   const { return v->pane()->hds(); }
+  HDS_overlay *get_hds( Vertex *v)   const { return &v->pane()->hds(); }
   HDS_overlay *get_hds( Halfedge *h) const { return get_hds(h->vertex()); }
 
   RFC_Pane_overlay *get_pane( Vertex *v)   const { return v->pane(); }
@@ -258,7 +258,7 @@ public:
     return f->halfedge();
   }
 
-  const HDS_overlay *get_hds( const Vertex *v)   const { return v->pane()->hds(); }
+  const HDS_overlay *get_hds( const Vertex *v)   const { return &v->pane()->hds(); }
   const HDS_overlay *get_hds( const Halfedge *h) const { return get_hds(h->vertex()); }
 
   const RFC_Pane_overlay *get_pane(const Vertex *v)   const 
