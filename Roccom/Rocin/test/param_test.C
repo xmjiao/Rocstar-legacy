@@ -35,8 +35,8 @@
 // Initial versions.
 //
 
-/** A test program that reads in a given parameter file and writes 
- *  out the resulting parameter window into one HDF file using 
+/** A test program that reads in a given parameter file and writes
+ *  out the resulting parameter window into one HDF file using
  *  Rocout with a given file prefix. */
 
 #include "Rocin.h"
@@ -48,49 +48,43 @@
 #include <cstring>
 #include <string>
 
-COM_EXTERN_MODULE( Rocin);
-COM_EXTERN_MODULE( Rocout);
+COM_EXTERN_MODULE(Rocin);
+COM_EXTERN_MODULE(Rocout);
 
 using namespace std;
 
 int main(int argc, char *argv[]) {
-  COM_init( &argc, &argv);
+  COM_init(&argc, &argv);
 
-  if ( argc < 3 || argc > 3 ) {
-    std::cout << "Usage: To test in serial: \n\t" << argv[0] 
-	      << " <parameter file> <winname>\n"
-	      << std::endl;
+  if (argc < 3 || argc > 3) {
+    std::cout << "Usage: To test in serial: \n\t" << argv[0]
+              << " <parameter file> <winname>\n"
+              << std::endl;
     exit(-1);
   }
 
-  const char *FILE_in  = argv[1];
+  const char  *FILE_in = argv[1];
   const string winname(argv[2]);
 
   COM_set_profiling(1);
   COM_set_verbose(10);
 
-  COM_LOAD_MODULE_STATIC_DYNAMIC( Rocin, "IN");
-  COM_LOAD_MODULE_STATIC_DYNAMIC( Rocout, "OUT");
+  COM_LOAD_MODULE_STATIC_DYNAMIC(Rocin, "IN");
+  COM_LOAD_MODULE_STATIC_DYNAMIC(Rocout, "OUT");
 
   //===== Read in parameter file using Rocin
-  int IN_param = COM_get_function_handle( "IN.read_parameter_file");
+  int IN_param = COM_get_function_handle("IN.read_parameter_file");
 
   COM_call_function(IN_param, FILE_in, winname.c_str());
-  int PARAM_all = COM_get_attribute_handle ((winname+".all").c_str());
+  int PARAM_all = COM_get_attribute_handle((winname + ".all").c_str());
 
   COM_window_init_done(winname.c_str());
 
   //===== Write out using Rocout
-  int OUT_write = COM_get_function_handle( "OUT.write_attribute");
-  COM_call_function( OUT_write, winname.c_str(), 
- 		     &PARAM_all,winname.c_str(), "000");
+  int OUT_write = COM_get_function_handle("OUT.write_attribute");
+  COM_call_function(OUT_write, winname.c_str(), &PARAM_all, winname.c_str(),
+                    "000");
 
   COM_print_profile("", "");
   COM_finalize();
 }
-
-
-
-
-
-

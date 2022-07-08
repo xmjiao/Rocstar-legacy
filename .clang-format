@@ -1,0 +1,9 @@
+---
+BasedOnStyle: Google
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: true
+AlwaysBreakBeforeMultilineStrings: true
+Cpp11BracedListStyle: true
+Standard: Cpp11
+SortIncludes: false
+...

@@ -48,9 +48,9 @@
 //
 
 /** A test program that reads in a given parameter file using Rocin
- *  and writes out the resulting parameter window into a new 
+ *  and writes out the resulting parameter window into a new
  *  parameter file using Rocout.
-*/
+ */
 
 // Set WINDOW_EXISTS to 1 to test behavior if the parameter
 // window exists prior to calling Rocin::read_parameter_file.
@@ -72,61 +72,65 @@
 #include <cstring>
 #include <string>
 
-COM_EXTERN_MODULE( Rocin);
-COM_EXTERN_MODULE( Rocout);
+COM_EXTERN_MODULE(Rocin);
+COM_EXTERN_MODULE(Rocout);
 
 using namespace std;
 
 int main(int argc, char *argv[]) {
-  COM_init( &argc, &argv);
+  COM_init(&argc, &argv);
 
-  if ( argc < 3 || argc > 3 ) {
-    std::cout << "Usage: To test in serial: \n\t" << argv[0] 
-	      << " <parameter file in> <parameter file out>\n"
-	      << std::endl;
+  if (argc < 3 || argc > 3) {
+    std::cout << "Usage: To test in serial: \n\t" << argv[0]
+              << " <parameter file in> <parameter file out>\n"
+              << std::endl;
     exit(-1);
   }
 
-  const char *FILE_in  = argv[1];
-  const char *FILE_out = argv[2]; 
+  const char  *FILE_in  = argv[1];
+  const char  *FILE_out = argv[2];
   const string winname("parameters");
-    //const string winname(argv[2]);
+  // const string winname(argv[2]);
 
   COM_set_profiling(1);
-  //COM_set_verbose(10);
+  // COM_set_verbose(10);
 
-  COM_LOAD_MODULE_STATIC_DYNAMIC( Rocin, "IN");
-  COM_LOAD_MODULE_STATIC_DYNAMIC( Rocout, "OUT");
-  int IN_param = COM_get_function_handle( "IN.read_parameter_file");
-  int OUT_param = COM_get_function_handle( "OUT.write_parameter_file");  
+  COM_LOAD_MODULE_STATIC_DYNAMIC(Rocin, "IN");
+  COM_LOAD_MODULE_STATIC_DYNAMIC(Rocout, "OUT");
+  int IN_param  = COM_get_function_handle("IN.read_parameter_file");
+  int OUT_param = COM_get_function_handle("OUT.write_parameter_file");
 
   //===== Add some non parameter formatted attributes to the window
   // a parameter formatted attribute is a windowed COM_CHAR attribute
   // with 1 component
-  void* addr;
+  void *addr;
 
-  if(WINDOW_EXISTS){
+  if (WINDOW_EXISTS) {
     COM_new_window(winname.c_str());
-    COM_new_attribute( (winname+"."+"burnrate").c_str(),'w',COM_CHAR,1,"");
-    COM_set_size( (winname+"."+"burnrate").c_str(),0,6,0);
-    COM_resize_array( (winname+"."+"burnrate").c_str(),0,&addr);
-    ((char*&)addr) = "three";
-    
-    COM_new_attribute( (winname+"."+"notwindowed").c_str(),'p',COM_CHAR,1,"");
-    COM_set_size( (winname+"."+"notwindowed").c_str(),0,12,0);
-    COM_resize_array( (winname+"."+"notwindowed").c_str(),0,&addr);
-    ((char*&)addr) = "notwindowed";
-    
-    COM_new_attribute( (winname+"."+"wrongtype").c_str(),'w',COM_INT,1,"");
-    COM_set_size( (winname+"."+"wrongtype").c_str(),0,1,0);
-    COM_resize_array( (winname+"."+"wrongtype").c_str(),0,&addr);
-    ((int*&)addr)[1] = 1;
-    
-    COM_new_attribute( (winname+"."+"toomanycomps").c_str(),'w',COM_CHAR,2,"");
-    COM_set_size( (winname+"."+"toomanycomps").c_str(),0,13,0);
-    COM_resize_array( (winname+"."+"toomanycomps").c_str(),0,&addr);
-    ((char*&)addr) = "toomanycomps";
-    
+    COM_new_attribute((winname + "." + "burnrate").c_str(), 'w', COM_CHAR, 1,
+                      "");
+    COM_set_size((winname + "." + "burnrate").c_str(), 0, 6, 0);
+    COM_resize_array((winname + "." + "burnrate").c_str(), 0, &addr);
+    ((char *&)addr) = "three";
+
+    COM_new_attribute((winname + "." + "notwindowed").c_str(), 'p', COM_CHAR, 1,
+                      "");
+    COM_set_size((winname + "." + "notwindowed").c_str(), 0, 12, 0);
+    COM_resize_array((winname + "." + "notwindowed").c_str(), 0, &addr);
+    ((char *&)addr) = "notwindowed";
+
+    COM_new_attribute((winname + "." + "wrongtype").c_str(), 'w', COM_INT, 1,
+                      "");
+    COM_set_size((winname + "." + "wrongtype").c_str(), 0, 1, 0);
+    COM_resize_array((winname + "." + "wrongtype").c_str(), 0, &addr);
+    ((int *&)addr)[1] = 1;
+
+    COM_new_attribute((winname + "." + "toomanycomps").c_str(), 'w', COM_CHAR,
+                      2, "");
+    COM_set_size((winname + "." + "toomanycomps").c_str(), 0, 13, 0);
+    COM_resize_array((winname + "." + "toomanycomps").c_str(), 0, &addr);
+    ((char *&)addr) = "toomanycomps";
+
     COM_window_init_done(winname.c_str());
   }
 
@@ -134,14 +138,8 @@ int main(int argc, char *argv[]) {
   COM_call_function(IN_param, FILE_in, (winname).c_str());
 
   //===== Write out using Rocout
-  COM_call_function( OUT_param, FILE_out, (winname).c_str());
+  COM_call_function(OUT_param, FILE_out, (winname).c_str());
 
   COM_print_profile("", "");
   COM_finalize();
 }
-
-
-
-
-
-

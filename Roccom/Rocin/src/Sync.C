@@ -26,18 +26,16 @@
 #include "Sync.h"
 #include "commpi.h"
 
-Mutex::Mutex()
-{
+Mutex::Mutex() {
   int err = pthread_mutex_init(&m_mutex, NULL);
-  m_isOk = (err == 0);
+  m_isOk  = (err == 0);
   if (!m_isOk) {
     std::cerr << "Mutex::Mutex(): pthread_mutex_init() returned " << err
               << std::endl;
   }
 }
 
-Mutex::~Mutex()
-{
+Mutex::~Mutex() {
   if (m_isOk) {
     int err = pthread_mutex_destroy(&m_mutex);
     if (err != 0 && !COMMPI_Initialized()) {
@@ -47,8 +45,7 @@ Mutex::~Mutex()
   }
 }
 
-int Mutex::Lock()
-{
+int Mutex::Lock() {
   int err = pthread_mutex_lock(&m_mutex);
   switch (err) {
     case 0:
@@ -71,29 +68,27 @@ int Mutex::Lock()
   return err;
 }
 
-int Mutex::TryLock()
-{
-    int err = pthread_mutex_trylock(&m_mutex);
-    switch (err) {
-      case 0:
-      case EBUSY:
-         break;
+int Mutex::TryLock() {
+  int err = pthread_mutex_trylock(&m_mutex);
+  switch (err) {
+    case 0:
+    case EBUSY:
+      break;
 
-      case EINVAL:
-        std::cerr << "Mutex::TryLock(): mutex not initialized." << std::endl;
-        break;
+    case EINVAL:
+      std::cerr << "Mutex::TryLock(): mutex not initialized." << std::endl;
+      break;
 
-      default:
-        std::cerr << "Mutex::TryLock(): pthread_mutex_trylock() returned "
-                  << err << std::endl;
-        break;
-    }
+    default:
+      std::cerr << "Mutex::TryLock(): pthread_mutex_trylock() returned " << err
+                << std::endl;
+      break;
+  }
 
-    return err;
+  return err;
 }
 
-int Mutex::Unlock()
-{
+int Mutex::Unlock() {
   int err = pthread_mutex_unlock(&m_mutex);
   switch (err) {
     case 0:
@@ -113,9 +108,7 @@ int Mutex::Unlock()
   return err;
 }
 
-Condition::Condition(Mutex& mutex)
-: m_mutex(mutex)
-{
+Condition::Condition(Mutex& mutex) : m_mutex(mutex) {
   int err = pthread_cond_init(&m_cond, NULL);
 
   m_isOk = (err == 0);
@@ -126,8 +119,7 @@ Condition::Condition(Mutex& mutex)
   }
 }
 
-Condition::~Condition()
-{
+Condition::~Condition() {
   if (m_isOk) {
     int err = pthread_cond_destroy(&m_cond);
     if (err != 0 && !COMMPI_Initialized()) {
@@ -137,8 +129,7 @@ Condition::~Condition()
   }
 }
 
-int Condition::Wait()
-{
+int Condition::Wait() {
   int err = pthread_cond_wait(&m_cond, &(m_mutex.m_mutex));
   if (err != 0)
     std::cerr << "Condition::Wait(): pthread_cond_wait() returned " << err
@@ -147,8 +138,7 @@ int Condition::Wait()
   return err;
 }
 
-int Condition::Signal()
-{
+int Condition::Signal() {
   int err = pthread_cond_signal(&m_cond);
   if (err != 0)
     std::cerr << "Condition::Signal(): pthread_cond_signal() returned " << err
@@ -157,8 +147,7 @@ int Condition::Signal()
   return err;
 }
 
-int Condition::Broadcast()
-{
+int Condition::Broadcast() {
   int err = pthread_cond_broadcast(&m_cond);
   if (err != 0)
     std::cerr << "Condition::Broadcast(): pthread_cond_broadcast() returned "
@@ -167,29 +156,24 @@ int Condition::Broadcast()
   return err;
 }
 
-Semaphore::Semaphore(int initialcount, int maxcount)
-: m_cond(m_mutex)
-{
-  if ((initialcount < 0 || maxcount < 0)
-      || ((maxcount > 0) && (initialcount > maxcount))) {
+Semaphore::Semaphore(int initialcount, int maxcount) : m_cond(m_mutex) {
+  if ((initialcount < 0 || maxcount < 0) ||
+      ((maxcount > 0) && (initialcount > maxcount))) {
     std::cerr << "Semaphore::Semaphore(): invalid initial or maximal count."
               << std::endl;
 
     m_isOk = false;
   } else {
     m_maxcount = maxcount;
-    m_count = initialcount;
+    m_count    = initialcount;
   }
 
   m_isOk = m_mutex.IsOk() && m_cond.IsOk();
 }
 
-Semaphore::~Semaphore()
-{
-}
+Semaphore::~Semaphore() {}
 
-bool Semaphore::Wait()
-{
+bool Semaphore::Wait() {
   m_mutex.Lock();
 
   while (m_count == 0) {
@@ -205,8 +189,7 @@ bool Semaphore::Wait()
   return true;
 }
 
-bool Semaphore::TryWait()
-{
+bool Semaphore::TryWait() {
   m_mutex.Lock();
 
   if (m_count == 0) {
@@ -220,8 +203,7 @@ bool Semaphore::TryWait()
   return true;
 }
 
-bool Semaphore::Post()
-{
+bool Semaphore::Post() {
   m_mutex.Lock();
 
   if (m_maxcount > 0 && m_count == m_maxcount) {
@@ -236,9 +218,3 @@ bool Semaphore::Post()
 
   return (result == 0);
 }
-
-
-
-
-
-
